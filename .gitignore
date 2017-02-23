@@ -1,0 +1,6 @@
+vehicles/
+non-vehicles/
+vehicle_test/
+test_images/
+examples/
+__pycache__/
