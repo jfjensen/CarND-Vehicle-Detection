@@ -1,9 +1,4 @@
-##Writeup Template
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
-**Vehicle Detection Project**
+#Vehicle Detection Project
 
 The goals / steps of this project are the following:
 
@@ -15,6 +10,7 @@ The goals / steps of this project are the following:
 * Estimate a bounding box for vehicles detected.
 
 [//]: # "Image References"
+
 [image1]: ./examples/car_not_car.png
 [image2]: ./examples/HOG_example.jpg
 [image3]: ./examples/sliding_windows.jpg
@@ -28,6 +24,17 @@ The goals / steps of this project are the following:
 ###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
+### Overview of the project files
+
+To this project belong the following files:
+
+- `writeup.md` The writeup (this document).
+- ...
+- `P5-notebook.ipynb` The Jupyter Notebook where the various steps ... have been tested and run.
+- `P5-notebook.html` HTML version of the Jupyter Notebook.
+- `/output_images` The directory containing the resulting images.
+- `project_video_result.mp4` The video showing the all the code at work.
+
 ###Histogram of Oriented Gradients (HOG)
 
 ####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
@@ -41,7 +48,9 @@ I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
-
+|   Original Image    |  Undistorted Image  |
+| :-----------------: | :-----------------: |
+| ![alt text][image1] | ![alt text][image2] |
 
 ![alt text][image2]
 

@@ -7,7 +7,7 @@ import time
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import StandardScaler
 from skimage.feature import hog
-from lesson_functions import *
+from util_functions import *
 # NOTE: the next import is only valid for scikit-learn version <= 0.17
 # for scikit-learn >= 0.18 use:
 from sklearn.model_selection import train_test_split
@@ -19,35 +19,35 @@ from sklearn.externals import joblib
 
 # Define a function you will pass an image 
 # and the list of windows to be searched (output of slide_windows())
-def search_windows(img, windows, clf, scaler, color_space='RGB', 
-                    spatial_size=(32, 32), hist_bins=32, 
-                    hist_range=(0, 256), orient=9, 
-                    pix_per_cell=8, cell_per_block=2, 
-                    hog_channel=0, spatial_feat=True, 
-                    hist_feat=True, hog_feat=True):
+# def search_windows(img, windows, clf, scaler, color_space='RGB', 
+#                     spatial_size=(32, 32), hist_bins=32, 
+#                     hist_range=(0, 256), orient=9, 
+#                     pix_per_cell=8, cell_per_block=2, 
+#                     hog_channel=0, spatial_feat=True, 
+#                     hist_feat=True, hog_feat=True):
 
-    #1) Create an empty list to receive positive detection windows
-    on_windows = []
-    #2) Iterate over all windows in the list
-    for window in windows:
-        #3) Extract the test window from original image
-        test_img = cv2.resize(img[window[0][1]:window[1][1], window[0][0]:window[1][0]], (64, 64))      
-        #4) Extract features for that window using single_img_features()
-        features = single_img_features(test_img, color_space=color_space, 
-                            spatial_size=spatial_size, hist_bins=hist_bins, 
-                            orient=orient, pix_per_cell=pix_per_cell, 
-                            cell_per_block=cell_per_block, 
-                            hog_channel=hog_channel, spatial_feat=spatial_feat, 
-                            hist_feat=hist_feat, hog_feat=hog_feat)
-        #5) Scale extracted features to be fed to classifier
-        test_features = scaler.transform(np.array(features).reshape(1, -1))
-        #6) Predict using your classifier
-        prediction = clf.predict(test_features)
-        #7) If positive (prediction == 1) then save the window
-        if prediction == 1:
-            on_windows.append(window)
-    #8) Return windows for positive detections
-    return on_windows
+#     #1) Create an empty list to receive positive detection windows
+#     on_windows = []
+#     #2) Iterate over all windows in the list
+#     for window in windows:
+#         #3) Extract the test window from original image
+#         test_img = cv2.resize(img[window[0][1]:window[1][1], window[0][0]:window[1][0]], (64, 64))      
+#         #4) Extract features for that window using single_img_features()
+#         features = single_img_features(test_img, color_space=color_space, 
+#                             spatial_size=spatial_size, hist_bins=hist_bins, 
+#                             orient=orient, pix_per_cell=pix_per_cell, 
+#                             cell_per_block=cell_per_block, 
+#                             hog_channel=hog_channel, spatial_feat=spatial_feat, 
+#                             hist_feat=hist_feat, hog_feat=hog_feat)
+#         #5) Scale extracted features to be fed to classifier
+#         test_features = scaler.transform(np.array(features).reshape(1, -1))
+#         #6) Predict using your classifier
+#         prediction = clf.predict(test_features)
+#         #7) If positive (prediction == 1) then save the window
+#         if prediction == 1:
+#             on_windows.append(window)
+#     #8) Return windows for positive detections
+#     return on_windows
     
     
 # # Read in car and non-car images
@@ -87,7 +87,7 @@ hist_bins = 32    # Number of histogram bins
 spatial_feat = True # Spatial features on or off
 hist_feat = True # Histogram features on or off
 hog_feat = True # HOG features on or off
-y_start_stop = [400, 700] # Min and max in y to search in slide_window()
+y_start_stop = [400, 600] # Min and max in y to search in slide_window()
 
 car_features = extract_features(cars, color_space=color_space, 
                         spatial_size=spatial_size, hist_bins=hist_bins, 
@@ -143,7 +143,7 @@ draw_image = np.copy(image)
 image = image.astype(np.float32)/255
 
 windows = slide_window(image, x_start_stop=[None, None], y_start_stop=y_start_stop, 
-                    xy_window=(96, 96), xy_overlap=(0.5, 0.5))
+                    xy_window=(96, 96), xy_overlap=(0.8, 0.8))
 
 hot_windows = search_windows(image, windows, svc, X_scaler, color_space=color_space, 
                         spatial_size=spatial_size, hist_bins=hist_bins, 
@@ -158,7 +158,7 @@ plt.imshow(window_img)
 plt.show()
 
 print("Saving model...")
-path_svc = './svc_'+ color_space +'_HOG-'+ str(hog_channel) + '_featlen_' + str(len(X_train[0])) +'.pkl'
-path_scaler = './scaler_'+ color_space +'_HOG-'+ str(hog_channel) + '_featlen_' + str(len(X_train[0])) +'.pkl'
-# joblib.dump(svc, path_svc) 
+path_svc = './svc_2_'+ color_space +'_HOG-'+ str(hog_channel) + '_featlen_' + str(len(X_train[0])) +'.pkl'
+path_scaler = './scaler_2_'+ color_space +'_HOG-'+ str(hog_channel) + '_featlen_' + str(len(X_train[0])) +'.pkl'
+joblib.dump(svc, path_svc) 
 joblib.dump(X_scaler, path_scaler) 
