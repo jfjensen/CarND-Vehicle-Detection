@@ -44,9 +44,9 @@ To this project belong the following files:
 
 - `writeup.md` The writeup (this document).
 - `util_functions.py` A Python file containing many of the functions described in the course.
-- `train_scaler_svc.py` A Python file with the code to train the Scaler and the SVC.
-- `vehicle_detection.py` A Python file with the `VehicleDetection` class that brings all the functionality together.
-- `P5-notebook.ipynb` The Jupyter Notebook where the various steps of this project have been tested and run.
+- `train_scaler_svc.py` A Python file with the code to train the Scaler and the linear SVC.
+- `vehicle_detection.py` A Python file with the `VehicleDetection` class that brings all the vehicle detection functionality together.
+- `P5-notebook.ipynb` The Jupyter Notebook where various steps of this project have been tested and run.
 - `P5-notebook.html` HTML version of the Jupyter Notebook.
 - `/output_images` The directory containing the resulting images.
 - `project_video_result.mp4` The video showing the all the code at work.
@@ -97,11 +97,13 @@ The code for training the classifier can be found in the file `train_scaler_svm.
 
 First the HOG, histogram features and spatial features were extracted from the vehicle and non-vehicle datasets using the function `extract_features()` which is implemented in the file `util_functions.py`. The function is called at lines #47 and #53 for the two datasets respectively. The extracted features are combined into one dataset.
 
-Then, a scaler is trained in order to normalize the data features. This scaler is the `sklearn.preprocessing.StandardScaler`. This scaler is saved to a pickle file at line #93 for use in the detection functions.
+Then, a scaler is trained in order to normalize the data features. This scaler is the `sklearn.preprocessing.StandardScaler`. It is saved to a pickle file at line #93 for use in the detection functions.
 
 Once the data is scaled, it is split in to a training and test/validation set at line #73. The test/validation set is set to be 20% of the dataset.
 
 Finally a linear SVM is created using `sklearn.svm.LinearSVC` (in line #79) and trained using the data (in line #83). The SVM is run with the default arguments provided by the `sklearn` library. The SVM is also saved to a pickle file for use with the detection functions.
+
+The test/validation accuracy was > 99.2%.
 
 ###Sliding Window Search
 
@@ -111,7 +113,7 @@ The sliding window search is implemented with the functions `slide_window()`  lo
 
 These functions are called from the `process_image_2()` method in the `VehicleDetection` class located in the file `vehicle_detection.py` at line #82 and #85 respectively.
 
-I tried various window searches of window size 64x64px, 96x96px, 128x128px and 160x160px and each at various overlaps ranging from 0.5x0.5 to 0.8x0.8. In addition I tried starting at various different Y positions from 300 to 400 and ending at 600 to 700. In order to have a very complete search result (including finding cars both close and very far away) I tried to combine various window sizes. Yet in the end I settled on the one window size 96x96 with overlap 0.8x0.8 for speed reasons. The search windows start at 400 and end at 600. The closest cars are still found this way.
+I tried various window searches of window size 64x64px, 96x96px, 128x128px and 160x160px and each at various overlaps ranging from 0.5x0.5 to 0.8x0.8. In addition I tried starting at various different Y positions from 300 to 400 and ending at 600 to 700. In order to have a very complete search result (including finding cars both close and very far away) I tried to combine various window sizes. Yet in the end I settled on the one window size 96x96 with overlap 0.8x0.8 for speed reasons. The search windows start at 400px and end at 600px. The closest cars are still found this way.
 
 An example of the complete search area can be seen here:
 
@@ -119,7 +121,9 @@ An example of the complete search area can be seen here:
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on one scale using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Ultimately I searched on one scale using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result. Essentially the performance was optimized by choosing the best values for the parameters as mentioned above.
+
+Here are some example images:
 
 ![alt text][image4a]
 
@@ -141,11 +145,11 @@ Here's a [link to my video result](./project_video_result2.mp4)
 
 The method used to process the videoframes is `process_2()` and is part of the `VehicleDetection` class. This method is actually a wrapper for the method called `process_image_2()` in which the actual implementation resides. It can be found in the lines #76 to #108 in the file `vehicle_detection.py`.
 
-I recorded the positions of positive detections using the `slide_window()` and `search_windows()`functions in each frame of the video.  From the positive detections I created a heatmap. This heatmap is appended to a list which contains some of previous heatmaps. In total this list is to contain the last 25 heatmaps - the current one included.
+I recorded the positions of positive detections using the `slide_window()` and `search_windows()` functions in each frame of the video.  From the positive detections I created a heat map. This heat map is appended to a list which contains some of previous heat maps. In total this list is to contain the last 25 heat maps - the current one included.
 
-A sum of the last 25 heatmaps then thresholded at 15. The result is a new heatmap on which  I then use `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assume each blob corresponds to a vehicle.  I construct bounding boxes to cover the area of each blob detected. 
+The sum of the last 25 heat maps is then thresholded at value 15. The result is a new heat map on which  I then use `scipy.ndimage.measurements.label()` to identify individual blobs in the heat map.  I then assume each blob corresponds to a vehicle.  I construct bounding boxes to cover the area of each blob detected. 
 
-Here are example results showing the final bounding boxes and the heatmaps from three frames of video:
+Here are example results showing the final bounding boxes and the heat maps from three test frames from the video (do note that in this test case no heat maps are summed and the threshold is at value 1):
 
 ![alt text][image5a]
 
@@ -161,10 +165,11 @@ Note that there is also a method called `process_image()` in the `VehicleDetecti
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+It is possible to try an endless combination of window sizes and even using different techniques for finding the cars, but in the end the idea is to have a robust detection system which works fast (enough).
 
-|   Original Image    |  Undistorted Image  |
-| :-----------------: | :-----------------: |
-| ![alt text][image1] | ![alt text][image2] |
+The speed could probably be improved by doing partial searches on the outer edges of the video frames. Partial in the sense that if we have a video of 60 fps then we could easily search 1/6th of each frame, such that the full frame would be searched at 10 fps. In addition, we also know were new cars will appear. The focus for search could be narrowed down to those places.
 
-![alt text][image2]
+Once a car is found, we could do a small search around this car every frame. Simply to update the bounding box.
+
+I wonder how the detection will work in different lighting conditions. Possibly the dataset should be augmented with different brightness values and perhaps even changes in hue.
+
