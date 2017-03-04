@@ -1,7 +1,7 @@
+.ipynb_checkpoints
 vehicles/
 non-vehicles/
 examples/
 __pycache__/
 old/
 *.mp4
-.ipynb_checkpoints/
