@@ -75,11 +75,33 @@ Here are a few examples using HOG parameters of `orientations=12`, `pixels_per_c
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various combinations of parameters and when training the Linear SVM I found that the following parameters gave the highest probability of correct classification of vehicles and non-vehicles (> 99.2%):
+
+|          Parameter          |    Value(s)    |
+| :-------------------------: | :------------: |
+|         Color space         |     YCrCb      |
+|     #HOG  orientations      |       12       |
+|    #HOG pixels per cell     |      8px       |
+|    #HOG cells per block     |       2        |
+|        HOG channels         |      all       |
+| #Spatial binning dimensions |  32px x 32px   |
+|       #Histogram bins       |       32       |
+|      X start position       |      0px       |
+|       X stop position       | width of image |
+|      Y start position       |     400px      |
+|       Y stop position       |     600px      |
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+The code for training the classifier can be found in the file `train_scaler_svm.py`.
+
+First the HOG, histogram features and spatial features were extracted from the vehicle and non-vehicle datasets using the function `extract_features()` which is implemented in the file `util_functions.py`. The function is called at lines #47 and #53 for the two datasets respectively. The extracted features are combined into one dataset.
+
+Then, a scaler is trained in order to normalize the data features. This scaler is the `sklearn.preprocessing.StandardScaler`. This scaler is saved to a pickle file at line #93 for use in the detection functions.
+
+Once the data is scaled, it is split in to a training and test/validation set at line #73. The test/validation set is set to be 20% of the dataset.
+
+Finally a linear SVM is created using `sklearn.svm.LinearSVC` (in line #79) and trained using the data (in line #83). The SVM is run with the default arguments provided by the `sklearn` library. The SVM is also saved to a pickle file for use with the detection functions.
 
 ###Sliding Window Search
 
